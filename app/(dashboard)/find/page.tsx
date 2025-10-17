@@ -51,7 +51,6 @@ export default function FindPage() {
       showConfirmButton: true,
       confirmButtonText: 'Got it!',
       confirmButtonColor: '#3b82f6',
-      background: '#ffffff',
       customClass: {
         popup: 'rounded-xl',
         title: 'text-gray-900',

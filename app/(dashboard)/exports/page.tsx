@@ -79,18 +79,17 @@ export default function ExportsPage() {
   const handleDelete = async (id: string, topic: string) => {
     const result = await Swal.fire({
       title: 'Delete Brief?',
-      text: `Are you sure you want to delete "${topic}"? This action cannot be undone.`,
+      html: `Are you sure you want to delete "<strong>${topic}</strong>"? This action cannot be undone.`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'Cancel',
-      background: '#ffffff',
       customClass: {
         popup: 'rounded-xl',
         title: 'text-gray-900',
-        text: 'text-gray-600'
+        htmlContainer: 'text-gray-600'
       }
     });
 
@@ -112,7 +111,6 @@ export default function ExportsPage() {
             icon: 'success',
             timer: 2000,
             showConfirmButton: false,
-            background: '#ffffff',
             customClass: {
               popup: 'rounded-xl',
               title: 'text-gray-900'
@@ -123,7 +121,6 @@ export default function ExportsPage() {
             title: 'Error!',
             text: 'Failed to delete brief. Please try again.',
             icon: 'error',
-            background: '#ffffff',
             customClass: {
               popup: 'rounded-xl',
               title: 'text-gray-900'
@@ -136,7 +133,6 @@ export default function ExportsPage() {
           title: 'Error!',
           text: 'An error occurred while deleting the brief.',
           icon: 'error',
-          background: '#ffffff',
           customClass: {
             popup: 'rounded-xl',
             title: 'text-gray-900'
