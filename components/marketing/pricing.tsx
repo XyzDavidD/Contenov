@@ -71,7 +71,8 @@ export default function Pricing() {
 
   const handlePlanClick = (planName: string) => {
     if (planName === "Enterprise") {
-      // For enterprise, could open a contact form
+      // For enterprise, redirect to contact page
+      window.location.href = '/contact';
       return;
     }
 

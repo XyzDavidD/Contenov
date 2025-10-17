@@ -144,24 +144,6 @@ export default function Transformation() {
           </div>
         </div>
 
-        {/* Benefits Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {benefits.map((benefit, index) => (
-            <Card key={index} className="border-2 border-primary/20 hover:border-primary/30 transition-colors">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                  <benefit.icon className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold text-secondary mb-4">
-                  {benefit.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {benefit.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
 
       </div>
     </section>

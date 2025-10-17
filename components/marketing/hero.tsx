@@ -52,14 +52,9 @@ export default function Hero() {
               size="lg"
               variant="outline"
               className="border-secondary text-secondary hover:bg-secondary hover:text-white px-8 py-4 text-lg font-semibold"
-              onClick={() => {
-                const element = document.getElementById("demo-video");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
+              onClick={() => window.open('https://cal.com/daviddanciu/15min', '_blank')}
             >
-              Watch Live Demo →
+              Book a Demo →
             </Button>
           </div>
 

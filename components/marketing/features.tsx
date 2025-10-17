@@ -1,12 +1,7 @@
 import {
   Brain,
   Target,
-  FileText,
-  Download,
-  Zap,
   BarChart3,
-  Users,
-  Shield,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -31,28 +26,7 @@ const featureGroups = [
         description: "Data-driven recommendations based on what actually ranks and drives traffic in your niche."
       }
     ]
-  },
-  {
-    title: "Comprehensive Briefs",
-    description: "Everything your writers need to create content that ranks and converts",
-    features: [
-      {
-        icon: FileText,
-        title: "Complete Content Structure",
-        description: "Detailed H2/H3 outlines with content suggestions based on top-performing competitor articles."
-      },
-      {
-        icon: Zap,
-        title: "Lightning-Fast Generation",
-        description: "Generate comprehensive briefs in under 2 minutes instead of spending hours on manual research."
-      },
-      {
-        icon: Download,
-        title: "Multiple Export Formats",
-        description: "Export as PDF, Google Docs, Notion, or copy-paste ready text for any platform."
-      }
-    ]
-  },
+  }
 ];
 
 export default function Features() {
@@ -66,7 +40,7 @@ export default function Features() {
             <span className="gradient-text">Content That Converts</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Three powerful feature groups that transform your content creation process
+            Advanced AI-powered analysis that transforms your content creation process
           </p>
         </div>
 

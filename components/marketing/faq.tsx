@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Accordion,
   AccordionContent,
@@ -88,10 +90,16 @@ export default function FAQ() {
               Our team is here to help. Schedule a demo or reach out directly.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-colors">
+              <button 
+                className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-colors"
+                onClick={() => window.open('https://cal.com/daviddanciu/15min', '_blank')}
+              >
                 Schedule a Demo
               </button>
-              <button className="border-2 border-secondary text-secondary hover:bg-secondary hover:text-white px-8 py-3 text-lg font-semibold rounded-lg transition-colors">
+              <button 
+                className="border-2 border-secondary text-secondary hover:bg-secondary hover:text-white px-8 py-3 text-lg font-semibold rounded-lg transition-colors"
+                onClick={() => window.location.href = '/contact'}
+              >
                 Contact Support
               </button>
             </div>

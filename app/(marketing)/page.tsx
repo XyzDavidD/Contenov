@@ -7,10 +7,12 @@ import Features from "@/components/marketing/features";
 import About from "@/components/marketing/about";
 import Pricing from "@/components/marketing/pricing";
 import FAQ from "@/components/marketing/faq";
+import HashNavigation from "@/components/marketing/hash-navigation";
 
 export default function Home() {
   return (
     <>
+      <HashNavigation />
       <Hero />
       <DemoVideo />
       <ProblemAgitation />

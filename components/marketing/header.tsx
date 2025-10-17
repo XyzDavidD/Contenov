@@ -2,17 +2,27 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import Logo from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    // If we're on the home page, scroll to section
+    if (pathname === '/') {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+        setMobileMenuOpen(false);
+      }
+    } else {
+      // If we're on another page, navigate to home with hash
+      router.push(`/#${sectionId}`);
       setMobileMenuOpen(false);
     }
   };

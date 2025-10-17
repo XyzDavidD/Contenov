@@ -180,7 +180,7 @@ export default function SelectPlanPage() {
                   <Button
                     className="w-full"
                     variant="outline"
-                    disabled
+                    onClick={() => window.location.href = '/contact'}
                   >
                     Contact Us
                   </Button>

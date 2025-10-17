@@ -1,14 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import Logo from "@/components/shared/logo";
 import { Separator } from "@/components/ui/separator";
 
 export default function Footer() {
+  const router = useRouter();
+  const pathname = usePathname();
+
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    // If we're on the home page, scroll to section
+    if (pathname === '/') {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // If we're on another page, navigate to home with hash
+      router.push(`/#${sectionId}`);
     }
   };
 
@@ -61,7 +71,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="#"
+                  href="/privacy-policy"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Privacy Policy
@@ -69,7 +79,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/terms-of-service"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Terms of Service
@@ -77,7 +87,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/refund-policy"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Refund Policy
@@ -89,30 +99,10 @@ export default function Footer() {
 
         <Separator className="my-12" />
 
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex justify-center items-center mb-14">
           <p className="text-sm text-muted-foreground">
-            © 2024 Contenov. All rights reserved.
+            © 2025 Contenov. All rights reserved.
           </p>
-          <div className="flex gap-6">
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              Twitter
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              LinkedIn
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              Facebook
-            </Link>
-          </div>
         </div>
       </div>
     </footer>
