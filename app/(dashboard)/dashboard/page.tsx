@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { useCredits } from '@/lib/hooks/use-credits';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,9 +24,9 @@ interface UserData {
 export default function DashboardPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { credits, planType } = useCredits();
   const supabase = createClientComponentClient();
   
-  const [userData, setUserData] = useState<UserData | null>(null);
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,16 +38,6 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
-      // Fetch user data
-      const { data: userInfo, error: userError } = await supabase
-        .from('users')
-        .select('credits_remaining, plan_type, subscription_status')
-        .eq('id', user?.id)
-        .single();
-
-      if (userError) throw userError;
-      setUserData(userInfo);
-
       // Fetch recent briefs (last 5)
       const { data: briefsData, error: briefsError } = await supabase
         .from('briefs')
@@ -77,11 +68,11 @@ export default function DashboardPage() {
     return 0;
   };
 
-  const totalPlanCredits = userData ? getPlanCredits(userData.plan_type) : 0;
-  const briefsCreated = userData ? totalPlanCredits - userData.credits_remaining : 0;
-  const creditsRemaining = userData?.credits_remaining || 0;
+  const totalPlanCredits = planType ? getPlanCredits(planType) : 0;
+  const briefsCreated = credits !== null ? totalPlanCredits - credits : 0;
+  const creditsRemaining = credits || 0;
   const avgTimeSaved = briefsCreated > 0 ? (briefsCreated * 5.2).toFixed(1) : '0';
-  const teamMembers = userData ? getPlanTeamMembers(userData.plan_type) : 0;
+  const teamMembers = planType ? getPlanTeamMembers(planType) : 0;
 
   const stats = [
     {
@@ -100,7 +91,7 @@ export default function DashboardPage() {
       name: "Team Members",
       value: teamMembers.toString(),
       icon: Users,
-      description: `${userData?.plan_type || 'No'} plan`,
+      description: `${planType || 'No'} plan`,
     },
     {
       name: "Total Time Saved",
@@ -133,7 +124,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-secondary mb-2">Dashboard</h1>

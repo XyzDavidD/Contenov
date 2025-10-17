@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FileText, Download, Eye, Search, Loader2, Trash2, AlertCircle, X } from "lucide-react";
+import { FileText, Download, Eye, Search, Loader2, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Swal from 'sweetalert2';
 
 interface Brief {
   id: string;
@@ -30,9 +31,6 @@ export default function ExportsPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"recent" | "oldest">("recent");
-  
-  // Delete confirmation modal
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -78,25 +76,75 @@ export default function ExportsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    setDeleting(true);
-    try {
-      const response = await fetch(`/api/briefs/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        // Remove from local state
-        setBriefs(briefs.filter(b => b.id !== id));
-        setDeleteConfirmId(null);
-      } else {
-        alert('Failed to delete brief');
+  const handleDelete = async (id: string, topic: string) => {
+    const result = await Swal.fire({
+      title: 'Delete Brief?',
+      text: `Are you sure you want to delete "${topic}"? This action cannot be undone.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      background: '#ffffff',
+      customClass: {
+        popup: 'rounded-xl',
+        title: 'text-gray-900',
+        text: 'text-gray-600'
       }
-    } catch (error) {
-      console.error('Delete error:', error);
-      alert('Error deleting brief');
-    } finally {
-      setDeleting(false);
+    });
+
+    if (result.isConfirmed) {
+      setDeleting(true);
+      try {
+        const response = await fetch(`/api/briefs/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          // Remove from local state
+          setBriefs(briefs.filter(b => b.id !== id));
+          
+          // Show success message
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'Your brief has been deleted.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false,
+            background: '#ffffff',
+            customClass: {
+              popup: 'rounded-xl',
+              title: 'text-gray-900'
+            }
+          });
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to delete brief. Please try again.',
+            icon: 'error',
+            background: '#ffffff',
+            customClass: {
+              popup: 'rounded-xl',
+              title: 'text-gray-900'
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Delete error:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'An error occurred while deleting the brief.',
+          icon: 'error',
+          background: '#ffffff',
+          customClass: {
+            popup: 'rounded-xl',
+            title: 'text-gray-900'
+          }
+        });
+      } finally {
+        setDeleting(false);
+      }
     }
   };
 
@@ -240,10 +288,11 @@ export default function ExportsPage() {
                     size="sm"
                     variant="outline"
                     className="flex-1 hover:bg-red-50 hover:text-red-600 hover:border-red-200"
-                    onClick={() => setDeleteConfirmId(brief.id)}
+                    onClick={() => handleDelete(brief.id, brief.topic)}
+                    disabled={deleting}
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
-                    Delete
+                    {deleting ? 'Deleting...' : 'Delete'}
                   </Button>
                 </div>
               </CardContent>
@@ -252,48 +301,6 @@ export default function ExportsPage() {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
-      {deleteConfirmId && (
-        <div className="fixed bg-black/50 flex items-center justify-center z-[9999] p-4" style={{ top: 0, left: 0, right: 0, bottom: 0, margin: 0 }}>
-          <Card className="max-w-md w-full">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-red-600">
-                <AlertCircle className="h-5 w-5" />
-                Delete Brief
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-secondary">
-                Are you sure you want to delete this brief? This action cannot be undone.
-              </p>
-              <div className="bg-muted p-3 rounded-lg">
-                <p className="text-sm font-medium text-secondary">
-                  {briefs.find(b => b.id === deleteConfirmId)?.topic}
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setDeleteConfirmId(null)}
-                  disabled={deleting}
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  Cancel
-                </Button>
-                <Button
-                  className="flex-1 bg-red-600 hover:bg-red-700"
-                  onClick={() => handleDelete(deleteConfirmId)}
-                  disabled={deleting}
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  {deleting ? 'Deleting...' : 'Delete Brief'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
 
       {/* Export Formats Info */}
       <Card className="rounded-xl">

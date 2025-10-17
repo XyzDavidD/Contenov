@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { useCredits } from "@/lib/hooks/use-credits";
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ArrowRight, Lightbulb, AlertCircle, Loader2, CreditCard } from "lucide-react";
+import Swal from 'sweetalert2';
 import { cn } from "@/lib/utils";
 
 type LoadingStep = 'searching' | 'extracting' | 'analyzing' | 'generating';
@@ -22,42 +24,44 @@ const loadingMessages = {
 export default function FindPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { credits, planType, updateCredits } = useCredits();
   const supabase = createClientComponentClient();
   
   const [topic, setTopic] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStep, setLoadingStep] = useState<LoadingStep>('searching');
   const [error, setError] = useState<string | null>(null);
-  const [credits, setCredits] = useState<number | null>(null);
-  const [planType, setPlanType] = useState<string>('');
-
-  useEffect(() => {
-    if (user) {
-      fetchUserCredits();
-    }
-  }, [user]);
-
-  const fetchUserCredits = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('credits_remaining, plan_type')
-        .eq('id', user?.id)
-        .single();
-
-      if (error) throw error;
-      setCredits(data.credits_remaining);
-      setPlanType(data.plan_type);
-    } catch (err) {
-      console.error('Error fetching credits:', err);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsGenerating(true);
     setError(null);
     setLoadingStep('searching');
+    
+    // Show SweetAlert notification
+    Swal.fire({
+      title: 'Please don\'t close this window',
+      html: `
+        <div style="text-align: left;">
+          <p style="margin-bottom: 10px; font-size: 16px;">Brief generation typically takes around <strong>5 minutes</strong>.</p>
+          <p style="margin: 0; font-size: 14px; color: #6b7280;">If it takes longer than 10 minutes, please contact us.</p>
+        </div>
+      `,
+      icon: 'info',
+      showConfirmButton: true,
+      confirmButtonText: 'Got it!',
+      confirmButtonColor: '#3b82f6',
+      background: '#ffffff',
+      customClass: {
+        popup: 'rounded-xl',
+        title: 'text-gray-900',
+        htmlContainer: 'text-gray-600'
+      },
+      timer: 20000,
+      timerProgressBar: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    });
 
     try {
       // Call the generate brief API
@@ -83,7 +87,8 @@ export default function FindPage() {
 
       // Success! Update local credits and log debug data
       if (data.creditsRemaining !== undefined) {
-        setCredits(data.creditsRemaining);
+        updateCredits(data.creditsRemaining);
+        console.log(`💳 Credits updated: ${data.creditsRemaining}`);
       }
 
       console.log('🎉 ========================================');

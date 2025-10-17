@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { useCredits } from "@/lib/hooks/use-credits";
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 const navigation = [
@@ -50,50 +51,17 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const { user, loading: authLoading, signOut } = useAuth();
+  const { credits, planType, loading: loadingCredits } = useCredits();
   const supabase = createClientComponentClient();
   
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
-  const [credits, setCredits] = useState<number | null>(null);
-  const [planType, setPlanType] = useState<string>('');
-  const [loadingUserData, setLoadingUserData] = useState(true);
 
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/login');
       return;
     }
-
-    if (user) {
-      // Fetch user data from database
-      const fetchUserData = async () => {
-        try {
-          const { data, error } = await supabase
-            .from('users')
-            .select('credits_remaining, plan_type, subscription_status')
-            .eq('id', user.id)
-            .single();
-
-          if (error) {
-            console.error('Error fetching user data:', error);
-          } else if (data) {
-            setCredits(data.credits_remaining);
-            setPlanType(data.plan_type);
-            
-            // Warn if low on credits
-            if (data.credits_remaining < 5 && data.credits_remaining > 0) {
-              console.warn('Low credits warning');
-            }
-          }
-        } catch (err) {
-          console.error('Failed to fetch user data:', err);
-        } finally {
-          setLoadingUserData(false);
-        }
-      };
-
-      fetchUserData();
-    }
-  }, [user, authLoading, supabase, router]);
+  }, [user, authLoading, router]);
 
   const handleLogout = async () => {
     await signOut();
@@ -114,7 +82,7 @@ export default function DashboardLayout({
     return 'U';
   };
 
-  if (authLoading || loadingUserData) {
+  if (authLoading || loadingCredits) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F7F7F7]">
         <Loader2 className="h-8 w-8 animate-spin text-[#FF1B6B]" />
@@ -318,7 +286,7 @@ export default function DashboardLayout({
           "flex-1 transition-all duration-300 pt-16",
           sidebarExpanded ? "ml-60" : "ml-16"
         )}>
-          <div className="p-8 max-w-7xl mx-auto">
+          <div className="p-6 max-w-7xl mx-auto">
             {children}
           </div>
         </main>
