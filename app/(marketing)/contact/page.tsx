@@ -69,7 +69,7 @@ export default function ContactPage() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Message Sent!</h2>
             <p className="text-gray-600 mb-6">
-              Thank you for reaching out. We'll get back to you within 24 hours.
+              Thank you for reaching out. We&apos;ll get back to you within 24 hours.
             </p>
             <div className="flex flex-col gap-3">
               <Link href="/">
@@ -102,7 +102,7 @@ export default function ContactPage() {
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Have questions about Contenov? Need help with your content strategy? 
-            We're here to help you succeed.
+            We&apos;re here to help you succeed.
           </p>
         </div>
 
@@ -114,7 +114,7 @@ export default function ContactPage() {
                 Send us a Message
               </h2>
               <p className="text-muted-foreground text-sm">
-                Fill out the form below and we'll get back to you as soon as possible
+                Fill out the form below and we&apos;ll get back to you as soon as possible
               </p>
             </div>
             
@@ -165,7 +165,7 @@ export default function ContactPage() {
                     value={formData.subject}
                     onChange={handleChange}
                     className="h-10"
-                    placeholder="What's this about?"
+                    placeholder="What&apos;s this about?"
                   />
                 </div>
 

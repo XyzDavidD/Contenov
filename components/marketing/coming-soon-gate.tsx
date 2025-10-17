@@ -39,7 +39,7 @@ export default function ComingSoonGate() {
     setIsLoading(false);
   };
 
-  // If authenticated, don't show the gate
+  // If authenticated, don&apos;t show the gate
   if (isAuthenticated) {
     return null;
   }
@@ -110,7 +110,7 @@ export default function ComingSoonGate() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Don't have the password?{" "}
+              Don&apos;t have the password?{" "}
               <a 
                 href="mailto:displayourvision@gmail.com" 
                 className="text-primary hover:underline"

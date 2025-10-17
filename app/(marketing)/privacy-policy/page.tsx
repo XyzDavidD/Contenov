@@ -20,7 +20,7 @@ export default function PrivacyPolicy() {
             </CardHeader>
             <CardContent className="space-y-6">
               <p className="text-muted-foreground">
-                This Privacy Policy explains how we collect, use, and protect your information when you use Contenov's AI-powered content brief generation service.
+                This Privacy Policy explains how we collect, use, and protect your information when you use Contenov&apos;s AI-powered content brief generation service.
               </p>
 
               <h2 className="text-xl font-semibold text-secondary">Information We Collect</h2>

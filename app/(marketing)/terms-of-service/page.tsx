@@ -20,7 +20,7 @@ export default function TermsOfService() {
             </CardHeader>
             <CardContent className="space-y-6">
               <p className="text-muted-foreground">
-                These Terms govern your use of Contenov's AI-powered content brief generation service. By using our service, you agree to these Terms.
+                These Terms govern your use of Contenov&apos;s AI-powered content brief generation service. By using our service, you agree to these Terms.
               </p>
 
               <h2 className="text-xl font-semibold text-secondary">Service Description</h2>
@@ -49,7 +49,7 @@ export default function TermsOfService() {
                 <li>Payments processed securely through Stripe</li>
                 <li>Monthly billing in advance</li>
                 <li>No refunds for unused credits</li>
-                <li>Credits reset monthly and don't roll over</li>
+                <li>Credits reset monthly and don&apos;t roll over</li>
               </ul>
 
               <h2 className="text-xl font-semibold text-secondary">Credit System</h2>

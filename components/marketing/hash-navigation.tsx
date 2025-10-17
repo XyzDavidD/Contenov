@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 
 export default function HashNavigation() {
-  const searchParams = useSearchParams();
-
   useEffect(() => {
     // Check if there's a hash in the URL
     const hash = window.location.hash;
