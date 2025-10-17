@@ -30,7 +30,7 @@ export default function ProblemAgitation() {
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Most content teams are stuck with outdated, time-consuming methods that drain resources 
-            and produce mediocre results. Here's what's really happening:
+            and produce mediocre results. Here&apos;s what&apos;s really happening:
           </p>
         </div>
 

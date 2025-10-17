@@ -113,7 +113,3 @@ export default function Features() {
     </section>
   );
 }
-
-
-
-

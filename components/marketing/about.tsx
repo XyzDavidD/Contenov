@@ -10,7 +10,7 @@ export default function About() {
             Why We Built <span className="gradient-text">Contenov</span>
           </h2>
           <p className="text-xl text-muted-foreground">
-            The story behind the platform that's transforming content creation
+            The story behind the platform that&apos;s transforming content creation
           </p>
         </div>
 
@@ -37,7 +37,7 @@ export default function About() {
 
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
-                    "Some while ago, I worked with a business that was generating blogs, and I had to upload them to the website. Before uploading them, there was a very long period of time I had to wait while the content strategist and writer were creating the blog.
+                    &ldquo;Some while ago, I worked with a business that was generating blogs, and I had to upload them to the website. Before uploading them, there was a very long period of time I had to wait while the content strategist and writer were creating the blog.
                   </p>
                   
                   <p>
@@ -45,7 +45,7 @@ export default function About() {
                   </p>
                   
                   <p>
-                    That's when I realized there had to be a better way. If we had a tool like Contenov back then, the entire process could have been much easier and more efficient."
+                    That&apos;s when I realized there had to be a better way. If we had a tool like Contenov back then, the entire process could have been much easier and more efficient.&rdquo;
                   </p>
                   
                   <p className="font-semibold text-secondary">
@@ -70,13 +70,13 @@ export default function About() {
               <h3 className="text-2xl font-bold text-secondary mb-4">Why This Matters</h3>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Great content drives business growth, but the research and planning process is broken. 
-                We're fixing it with AI that actually understands what makes content successful.
+                We&apos;re fixing it with AI that actually understands what makes content successful.
               </p>
             </div>
 
             <div className="text-left">
               <p className="text-lg text-secondary italic font-medium">
-                "I believe that great content should be accessible to everyone, not just big agencies with huge budgets."
+                &ldquo;I believe that great content should be accessible to everyone, not just big agencies with huge budgets.&rdquo;
               </p>
             </div>
           </div>

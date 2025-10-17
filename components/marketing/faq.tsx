@@ -58,7 +58,7 @@ export default function FAQ() {
             Frequently Asked <span className="gradient-text">Questions</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Got questions? We've got answers. Here are the most common concerns we hear from agencies.
+            Got questions? We&apos;ve got answers. Here are the most common concerns we hear from agencies.
           </p>
         </div>
 
@@ -101,7 +101,3 @@ export default function FAQ() {
     </section>
   );
 }
-
-
-
-
