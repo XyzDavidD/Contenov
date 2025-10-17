@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from './use-auth';
 import { eventEmitter, EVENTS } from '@/lib/events';
@@ -10,7 +10,7 @@ export function useCredits() {
   const [planType, setPlanType] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
-  const fetchCredits = async () => {
+  const fetchCredits = useCallback(async () => {
     if (!user) return;
     
     try {
@@ -34,7 +34,7 @@ export function useCredits() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, supabase]);
 
   const updateCredits = (newCredits: number) => {
     setCredits(newCredits);
@@ -46,7 +46,7 @@ export function useCredits() {
     if (user) {
       fetchCredits();
     }
-  }, [user]);
+  }, [user, fetchCredits]);
 
   // Listen for global credit updates
   useEffect(() => {
