@@ -40,26 +40,98 @@ export default function FindPage() {
     
     // Show SweetAlert notification
     Swal.fire({
-      title: 'Please don\'t close this window',
+      title: '<div style="font-size: 28px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">Your brief is being generated</div>',
       html: `
-        <div style="text-align: left;">
-          <p style="margin-bottom: 10px; font-size: 16px;">Brief generation typically takes around <strong>5 minutes</strong>.</p>
-          <p style="margin: 0; font-size: 14px; color: #6b7280;">If it takes longer than 10 minutes, please contact us.</p>
+        <div style="text-align: center; padding: 8px 0;">
+          <div style="margin-bottom: 24px;">
+            <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);">
+              <svg style="width: 40px; height: 40px; color: white; animation: spin 2s linear infinite;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+          </div>
+          <p style="font-size: 17px; line-height: 1.6; color: #475569; margin: 0; font-weight: 500;">
+            It usually takes around <strong style="color: #3b82f6;">5-7 minutes</strong>, but we will email you as soon as it's ready. Please check your <strong style="color: #3b82f6;">Spam Folder</strong> as well!
+          </p>
+          <p style="font-size: 15px; line-height: 1.5; color: #64748b; margin: 16px 0 0; font-weight: 400;">
+            You can close this window.
+          </p>
         </div>
+        <style>
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        </style>
       `,
-      icon: 'info',
       showConfirmButton: true,
       confirmButtonText: 'Got it!',
       confirmButtonColor: '#3b82f6',
       customClass: {
-        popup: 'rounded-xl',
-        title: 'text-gray-900',
-        htmlContainer: 'text-gray-600'
+        popup: 'swal2-popup-custom',
+        title: 'swal2-title-custom',
+        htmlContainer: 'swal2-html-container-custom',
+        confirmButton: 'swal2-confirm-custom',
+        timerProgressBar: 'swal2-timer-progress-bar-custom'
       },
       timer: 20000,
       timerProgressBar: true,
-      allowOutsideClick: false,
-      allowEscapeKey: false
+      allowOutsideClick: true,
+      allowEscapeKey: true,
+      backdrop: `
+        rgba(15, 23, 42, 0.6)
+        left top
+        no-repeat
+      `,
+      didOpen: () => {
+        // Inject custom styles
+        const style = document.createElement('style');
+        style.textContent = `
+          .swal2-popup-custom {
+            border-radius: 24px !important;
+            padding: 40px 32px 32px !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+            max-width: 480px !important;
+          }
+          .swal2-title-custom {
+            padding: 0 !important;
+            margin: 0 0 8px 0 !important;
+          }
+          .swal2-html-container-custom {
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .swal2-confirm-custom {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 14px 32px !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4) !important;
+            transition: all 0.2s ease !important;
+            margin-top: 8px !important;
+          }
+          .swal2-confirm-custom:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5) !important;
+          }
+          .swal2-timer-progress-bar-container {
+            width: 80% !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            right: auto !important;
+          }
+          .swal2-timer-progress-bar-custom {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%) !important;
+            height: 4px !important;
+            border-radius: 2px !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }
     });
 
     try {

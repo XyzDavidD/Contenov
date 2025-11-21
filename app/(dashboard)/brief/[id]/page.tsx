@@ -25,6 +25,7 @@ interface BriefData {
   id: string;
   topic: string;
   created_at: string;
+  pdf_url?: string;
   seo_data: {
     title: string;
     primaryKeyword: string;
@@ -378,16 +379,7 @@ export default function BriefPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h3 className="font-semibold text-secondary mb-2">Search Intent</h3>
-                <p className="bg-muted/50 p-3 rounded-lg">{brief.seo_data.searchIntent}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-secondary mb-2">Difficulty</h3>
-                <p className="bg-muted/50 p-3 rounded-lg">{brief.seo_data.difficulty}</p>
-              </div>
-            </div>
+            
           </div>
         </EditableSection>
 
@@ -429,14 +421,14 @@ export default function BriefPage() {
                 {brief.structure.sections.map((section, index) => (
                   <div key={index} className="bg-muted/50 p-4 rounded-lg">
                     <p className="font-semibold text-secondary mb-2">
-                      H2: {section.h2}
+                       {section.h2}
                     </p>
                     {section.h3s.length > 0 && (
                       <ul className="ml-4 space-y-1">
                         {section.h3s.map((h3, h3Index) => (
                           <li key={h3Index} className="text-sm text-muted-foreground flex items-start">
                             <span className="mr-2">•</span>
-                            H3: {h3}
+                             {h3}
                           </li>
                         ))}
                       </ul>

@@ -5,6 +5,8 @@ import { findBlogPosts } from '@/lib/serp-service';
 import { extractMultipleBlogContents } from '@/lib/jina-service';
 import { analyzeBlogIndividually, synthesizeFinalBrief } from '@/lib/gemini-service';
 import { supabaseAdmin } from '@/lib/supabase';
+import { generateBriefPDF } from '@/lib/pdf-service';
+import { sendBriefEmail } from '@/lib/email-service';
 
 export async function POST(request: NextRequest) {
   console.log('\n🚀 ========================================');
@@ -236,8 +238,64 @@ export async function POST(request: NextRequest) {
       
       console.log(`✅ Step 5 complete: Brief saved with ID: ${savedBrief.id}\n`);
       
-      // 7. Deduct 1 credit
-      console.log('💳 STEP 6: Deducting credit...');
+      // 7. Generate PDF and upload to Supabase Storage
+      console.log('📄 STEP 6: Generating PDF and uploading to storage...');
+      console.log('─────────────────────────────────────────');
+      
+      let pdfUrl: string | null = null;
+      
+      try {
+        // Generate PDF
+        const pdfBuffer = await generateBriefPDF({
+          topic: topic,
+          seo_data: finalBrief.seoData,
+          target_specs: finalBrief.targetSpecs,
+          structure: finalBrief.structure,
+          competitor_analysis: finalBrief.competitorAnalysis,
+          content_requirements: finalBrief.contentRequirements,
+          writing_instructions: finalBrief.writingInstructions,
+          meta_data: {
+            ...finalBrief.metaData,
+            sources: blogResults.map(r => ({ url: r.url, title: r.title })),
+            sourcesAnalyzed: analyses.length,
+            totalSourcesFound: blogResults.length
+          }
+        });
+        
+        // Upload to Supabase Storage
+        const fileName = `briefs/${user.id}/${savedBrief.id}.pdf`;
+        const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+          .from('brief-pdfs')
+          .upload(fileName, pdfBuffer, {
+            contentType: 'application/pdf',
+            upsert: false
+          });
+        
+        if (uploadError) {
+          console.error('⚠️  Warning: Failed to upload PDF:', uploadError);
+        } else {
+          // Get public URL
+          const { data: urlData } = supabaseAdmin.storage
+            .from('brief-pdfs')
+            .getPublicUrl(fileName);
+          
+          pdfUrl = urlData.publicUrl;
+          
+          // Update brief with PDF URL
+          await supabaseAdmin
+            .from('briefs')
+            .update({ pdf_url: pdfUrl })
+            .eq('id', savedBrief.id);
+          
+          console.log(`✅ Step 6 complete: PDF uploaded. URL: ${pdfUrl}\n`);
+        }
+      } catch (error) {
+        console.error('⚠️  Warning: PDF generation/upload failed:', error);
+        // Don't fail the request if PDF generation fails - brief was already generated
+      }
+      
+      // 8. Deduct 1 credit
+      console.log('💳 STEP 7: Deducting credit...');
       console.log('─────────────────────────────────────────');
       
       const newCreditsRemaining = userData.credits_remaining - 1;
@@ -254,7 +312,38 @@ export async function POST(request: NextRequest) {
         console.error('⚠️  Warning: Failed to deduct credit:', creditError);
         // Don't fail the request if credit deduction fails - brief was already generated
       } else {
-        console.log(`✅ Step 6 complete: Credit deducted. New balance: ${newCreditsRemaining}\n`);
+        console.log(`✅ Step 7 complete: Credit deducted. New balance: ${newCreditsRemaining}\n`);
+      }
+      
+      // 9. Send email notification (async, don't wait for it)
+      if (pdfUrl) {
+        console.log('📧 STEP 8: Sending email notification...');
+        console.log('─────────────────────────────────────────');
+        
+        // Get user's name and email
+        const { data: userInfo } = await supabaseAdmin
+          .from('users')
+          .select('name, email')
+          .eq('id', user.id)
+          .single();
+        
+        if (userInfo?.email) {
+          sendBriefEmail({
+            to: userInfo.email,
+            userName: userInfo.name || 'there',
+            briefTopic: topic,
+            pdfUrl: pdfUrl,
+            briefId: savedBrief.id,
+          }).then((result) => {
+            if (result.success) {
+              console.log('✅ Email sent successfully\n');
+            } else {
+              console.error('⚠️  Warning: Failed to send email:', result.error);
+            }
+          }).catch((error) => {
+            console.error('⚠️  Warning: Email sending error:', error);
+          });
+        }
       }
       
       const endTime = Date.now();
@@ -264,6 +353,9 @@ export async function POST(request: NextRequest) {
       console.log('🎉 BRIEF GENERATION COMPLETE!');
       console.log(`🎉 Total time: ${totalTime} seconds`);
       console.log(`🎉 Brief ID: ${savedBrief.id}`);
+      if (pdfUrl) {
+        console.log(`🎉 PDF URL: ${pdfUrl}`);
+      }
       console.log('🎉 ========================================\n');
       
       return NextResponse.json({
@@ -271,6 +363,7 @@ export async function POST(request: NextRequest) {
         briefId: savedBrief.id,
         brief: finalBrief,
         creditsRemaining: newCreditsRemaining,
+        pdfUrl: pdfUrl || undefined,
         metadata: {
           blogsAnalyzed: analyses.length,
           totalTime: `${totalTime}s`,
