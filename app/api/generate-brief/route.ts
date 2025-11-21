@@ -315,35 +315,44 @@ export async function POST(request: NextRequest) {
         console.log(`✅ Step 7 complete: Credit deducted. New balance: ${newCreditsRemaining}\n`);
       }
       
-      // 9. Send email notification (async, don't wait for it)
+      // 9. Send email notification
       if (pdfUrl) {
         console.log('📧 STEP 8: Sending email notification...');
         console.log('─────────────────────────────────────────');
         
         // Get user's name and email
-        const { data: userInfo } = await supabaseAdmin
+        const { data: userInfo, error: userInfoError } = await supabaseAdmin
           .from('users')
           .select('name, email')
           .eq('id', user.id)
           .single();
         
-        if (userInfo?.email) {
-          sendBriefEmail({
-            to: userInfo.email,
-            userName: userInfo.name || 'there',
-            briefTopic: topic,
-            pdfUrl: pdfUrl,
-            briefId: savedBrief.id,
-          }).then((result) => {
-            if (result.success) {
+        if (userInfoError) {
+          console.error('⚠️  Warning: Failed to fetch user info for email:', userInfoError);
+        } else if (userInfo?.email) {
+          console.log(`📧 Sending email to: ${userInfo.email}`);
+          try {
+            const emailResult = await sendBriefEmail({
+              to: userInfo.email,
+              userName: userInfo.name || 'there',
+              briefTopic: topic,
+              pdfUrl: pdfUrl,
+              briefId: savedBrief.id,
+            });
+            
+            if (emailResult.success) {
               console.log('✅ Email sent successfully\n');
             } else {
-              console.error('⚠️  Warning: Failed to send email:', result.error);
+              console.error('⚠️  Warning: Failed to send email:', emailResult.error);
             }
-          }).catch((error) => {
-            console.error('⚠️  Warning: Email sending error:', error);
-          });
+          } catch (emailError) {
+            console.error('⚠️  Warning: Email sending error:', emailError);
+          }
+        } else {
+          console.error('⚠️  Warning: User email not found. Cannot send email.');
         }
+      } else {
+        console.log('⚠️  Warning: PDF URL not available. Skipping email notification.');
       }
       
       const endTime = Date.now();
