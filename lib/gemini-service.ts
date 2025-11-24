@@ -355,7 +355,7 @@ ABSOLUTE REQUIREMENTS:
         // If we have less than 3, pad with topic-specific suggestions
         while (validH3s.length < 3) {
           const placeholder = `Important aspect of ${section.h2 || topic}`;
-          if (!validH3s.some(h3 => h3.toLowerCase().includes(placeholder.toLowerCase()))) {
+          if (!validH3s.some((h3: string) => h3.toLowerCase().includes(placeholder.toLowerCase()))) {
             validH3s.push(placeholder);
           } else {
             validH3s.push(`Key consideration ${validH3s.length + 1} for ${section.h2 || topic}`);
