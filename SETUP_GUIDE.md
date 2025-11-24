@@ -858,9 +858,9 @@ npm install
 
 ### Development Server
 
-```bash
-npm run dev
-```
+   ```bash
+   npm run dev
+   ```
 
 Application will be available at: http://localhost:3000
 
