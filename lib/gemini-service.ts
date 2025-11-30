@@ -385,9 +385,25 @@ Return ONLY a JSON array of exactly 3 H3 bullet points:
           .replace(/```\n?/g, '')
           .trim();
         
-        const generatedH3s = JSON.parse(h3Text);
-        if (Array.isArray(generatedH3s) && generatedH3s.length >= 3) {
-          return generatedH3s.slice(0, 3);
+        try {
+          const generatedH3s = JSON.parse(h3Text);
+          if (Array.isArray(generatedH3s) && generatedH3s.length >= 3) {
+            return generatedH3s.slice(0, 3);
+          }
+        } catch (parseError) {
+          console.log(`[GEMINI] ⚠️ Failed to parse H3 JSON: ${parseError}`);
+          // Try to extract array from text if JSON parsing fails
+          const arrayMatch = h3Text.match(/\[[\s\S]*?\]/);
+          if (arrayMatch) {
+            try {
+              const extracted = JSON.parse(arrayMatch[0]);
+              if (Array.isArray(extracted) && extracted.length >= 3) {
+                return extracted.slice(0, 3);
+              }
+            } catch (e) {
+              // Ignore
+            }
+          }
         }
       } catch (error) {
         console.log(`[GEMINI] ⚠️ Failed to generate topic-specific H3s: ${error}`);
@@ -416,35 +432,71 @@ Return ONLY a JSON array of exactly 3 H3 bullet points:
       attempts++;
       console.log(`[GEMINI] 🔄 Generation attempt ${attempts}/${maxAttempts}`);
       
-      const result = await model.generateContent(currentPrompt);
-      const response = await result.response;
-      const text = response.text();
-      
-      // Clean the response
-      const cleanedText = text
-        .replace(/```json\n?/g, '')
-        .replace(/```\n?/g, '')
-        .trim();
-      
-      brief = JSON.parse(cleanedText);
-      
-      // Validate the brief has all required fields
-      if (!brief.seoData || !brief.targetSpecs || !brief.structure || 
-          !brief.competitorAnalysis || !brief.contentRequirements || 
-          !brief.writingInstructions || !brief.metaData) {
-        throw new Error('Generated brief is missing required fields');
-      }
-      
-      // Check if content is generic
-      if (!isGenericContent(brief)) {
-        console.log(`[GEMINI] ✅ Generated non-generic content on attempt ${attempts}`);
-        break;
-      } else {
-        console.log(`[GEMINI] ⚠️ Generic content detected, retrying... (attempt ${attempts}/${maxAttempts})`);
-        if (attempts < maxAttempts) {
-          // Add a stronger instruction for retry
-          currentPrompt = prompt + `\n\n⚠️ CRITICAL RETRY INSTRUCTION: Your previous attempt generated generic templates. You MUST create unique, topic-specific content for "${topic}". DO NOT use "Introduction", "Main Content", "Conclusion", or generic H3 patterns. Create original, valuable content specific to "${topic}".`;
+      try {
+        const result = await model.generateContent(currentPrompt);
+        const response = await result.response;
+        const text = response.text();
+        
+        // Clean the response
+        const cleanedText = text
+          .replace(/```json\n?/g, '')
+          .replace(/```\n?/g, '')
+          .trim();
+        
+        // Try to parse JSON
+        try {
+          brief = JSON.parse(cleanedText);
+        } catch (parseError) {
+          console.error(`[GEMINI] ❌ JSON parsing failed on attempt ${attempts}:`, parseError);
+          console.error(`[GEMINI] Response text (first 500 chars):`, cleanedText.substring(0, 500));
+          
+          if (attempts < maxAttempts) {
+            console.log(`[GEMINI] 🔄 Retrying due to JSON parse error...`);
+            currentPrompt = prompt + `\n\n⚠️ CRITICAL: You MUST return ONLY valid JSON. No markdown, no explanations, no code blocks. Just the raw JSON object.`;
+            continue;
+          } else {
+            throw new Error(`Failed to parse JSON response after ${maxAttempts} attempts: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`);
+          }
         }
+        
+        // Validate the brief has all required fields
+        if (!brief.seoData || !brief.targetSpecs || !brief.structure || 
+            !brief.competitorAnalysis || !brief.contentRequirements || 
+            !brief.writingInstructions || !brief.metaData) {
+          console.error(`[GEMINI] ❌ Missing required fields on attempt ${attempts}`);
+          console.error(`[GEMINI] Brief structure:`, Object.keys(brief));
+          
+          if (attempts < maxAttempts) {
+            console.log(`[GEMINI] 🔄 Retrying due to missing fields...`);
+            currentPrompt = prompt + `\n\n⚠️ CRITICAL: Your response MUST include all required fields: seoData, targetSpecs, structure, competitorAnalysis, contentRequirements, writingInstructions, metaData.`;
+            continue;
+          } else {
+            throw new Error('Generated brief is missing required fields after all attempts');
+          }
+        }
+        
+        // Check if content is generic
+        if (!isGenericContent(brief)) {
+          console.log(`[GEMINI] ✅ Generated non-generic content on attempt ${attempts}`);
+          break;
+        } else {
+          console.log(`[GEMINI] ⚠️ Generic content detected, retrying... (attempt ${attempts}/${maxAttempts})`);
+          if (attempts < maxAttempts) {
+            // Add a stronger instruction for retry
+            currentPrompt = prompt + `\n\n⚠️ CRITICAL RETRY INSTRUCTION: Your previous attempt generated generic templates. You MUST create unique, topic-specific content for "${topic}". DO NOT use "Introduction", "Main Content", "Conclusion", or generic H3 patterns. Create original, valuable content specific to "${topic}".`;
+          }
+        }
+      } catch (error) {
+        console.error(`[GEMINI] ❌ Error on attempt ${attempts}:`, error);
+        
+        if (attempts >= maxAttempts) {
+          // Re-throw to trigger fallback
+          throw error;
+        }
+        
+        // Wait a bit before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        currentPrompt = prompt + `\n\n⚠️ RETRY: Previous attempt failed. Please ensure you return valid JSON with all required fields.`;
       }
     }
     
@@ -490,7 +542,27 @@ Return ONLY a JSON array of exactly 3 H3 bullet points:
         // If we have less than 3 OR generic H3s, generate topic-specific ones
         if (validH3s.length < 3 || hasGenericH3s) {
           console.log(`[GEMINI] 🔄 Generating topic-specific H3s for "${section.h2}"`);
-          validH3s = await generateTopicSpecificH3s(section.h2, validH3s);
+          try {
+            const generatedH3s = await generateTopicSpecificH3s(section.h2, validH3s);
+            if (generatedH3s && generatedH3s.length >= 3) {
+              validH3s = generatedH3s;
+            } else {
+              console.log(`[GEMINI] ⚠️ Generated H3s insufficient, using existing ones`);
+            }
+          } catch (h3Error) {
+            console.error(`[GEMINI] ⚠️ Failed to generate topic-specific H3s:`, h3Error);
+            // Continue with existing H3s or pad them
+            if (validH3s.length < 3) {
+              // Use competitor H3s as fallback
+              const competitorH3s = allH3Headings.filter(h3 => h3 && h3.trim());
+              while (validH3s.length < 3 && competitorH3s.length > 0) {
+                const h3 = competitorH3s.shift();
+                if (h3 && !validH3s.some((existing: string) => existing.toLowerCase() === h3.toLowerCase())) {
+                  validH3s.push(h3);
+                }
+              }
+            }
+          }
         }
         
         // Ensure exactly 3
@@ -574,7 +646,32 @@ Return ONLY JSON:
         .replace(/```\n?/g, '')
         .trim();
       
-      const fallbackData = JSON.parse(fallbackText);
+      let fallbackData: any;
+      try {
+        fallbackData = JSON.parse(fallbackText);
+      } catch (parseError) {
+        console.error(`[GEMINI] ❌ Failed to parse fallback JSON:`, parseError);
+        console.error(`[GEMINI] Fallback response (first 500 chars):`, fallbackText.substring(0, 500));
+        // Create a minimal fallback structure
+        fallbackData = {
+          h1: `Expert Guide: ${topic}`,
+          sections: allH2s.slice(0, 4).map((h2: string) => ({
+            h2: h2 || `Key Aspect of ${topic}`,
+            h3s: allH3s.filter((h3: string) => h3 && h3.toLowerCase().includes((h2 || topic).toLowerCase().split(' ')[0])).slice(0, 3)
+          })).filter((s: any) => s.h3s.length >= 3)
+        };
+        
+        // If we still don't have enough sections, create generic but topic-specific ones
+        if (fallbackData.sections.length < 4) {
+          const topicWords = topic.split(' ').slice(0, 2);
+          fallbackData.sections = [
+            { h2: `Understanding ${topicWords.join(' ')}`, h3s: allH3s.slice(0, 3).filter((h: string) => h && h.trim()) },
+            { h2: `Best ${topicWords.join(' ')} Solutions`, h3s: allH3s.slice(3, 6).filter((h: string) => h && h.trim()) },
+            { h2: `How to Choose ${topicWords.join(' ')}`, h3s: allH3s.slice(6, 9).filter((h: string) => h && h.trim()) },
+            { h2: `${topicWords.join(' ')} Best Practices`, h3s: allH3s.slice(9, 12).filter((h: string) => h && h.trim()) }
+          ].filter((s: any) => s.h3s.length >= 3);
+        }
+      }
       
       return {
         seoData: {
