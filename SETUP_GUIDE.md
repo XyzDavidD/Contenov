@@ -809,7 +809,7 @@ SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 # AI Service API Keys
 SERP_API_KEY=eafae259fdd38902d109f1953e18880c12e6f8fb25d3ef5c528e8b9ed0515384
 JINA_API_KEY=jina_e8deb8689bc342fa9b81e70fac8d8defwL9V4VuMtNdYaDIcXc8WBvM4l4DI
-GEMINI_API_KEY=AIzaSyDmtEAwdHOZ2zD-TlZ--_rIEQb6m1JT3_s
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 **Important Notes:**
@@ -1401,8 +1401,8 @@ SUPABASE_SERVICE_KEY=eyJhbGci...
 # AI Services
 SERP_API_KEY=eafae259fdd...
 JINA_API_KEY=jina_e8deb8689...
-GEMINI_API_KEY=AIzaSyDmtEAwdHOZ2zD...
-GOOGLE_GENERATIVE_AI_API_KEY=AIzaSyDmtEAwdHOZ2zD...
+GEMINI_API_KEY=your_gemini_api_key_here
+GOOGLE_GENERATIVE_AI_API_KEY=your_google_generative_ai_api_key_here
 
 # Stripe
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51SGgHyEcmS15LnE...
