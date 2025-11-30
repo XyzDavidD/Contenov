@@ -22,7 +22,7 @@ export default function About() {
                 <div className="flex items-center gap-4 mb-6">
                   <Avatar className="w-16 h-16">
                     <AvatarImage 
-                      src="https://media.licdn.com/dms/image/v2/D5603AQFBaEEKwF-3nA/profile-displayphoto-crop_800_800/B56Zl6ZAllIAAI-/0/1758695002356?e=1762992000&v=beta&t=G5ODDdeeIvSIhuP3OAaQa15Yvd6rLxBtL6jW2Iu6jIQ" 
+                      src="https://pbs.twimg.com/profile_images/1970736676105318400/MTehzdcA_400x400.jpg" 
                       alt="David Danciu"
                     />
                     <AvatarFallback className="bg-primary text-white text-xl font-bold">
