@@ -206,118 +206,247 @@ export async function synthesizeFinalBrief(
     const allKeywords = analyses.flatMap(a => a.primaryKeywords);
     const uniqueKeywords = Array.from(new Set(allKeywords));
     
-    const prompt = `CREATE A COMPREHENSIVE BLOG BRIEF FOR: "${topic}"
+    const prompt = `YOU ARE AN EXPERT CONTENT STRATEGIST. Create a comprehensive, topic-specific blog brief for: "${topic}"
 
-I analyzed ${analyses.length} competitor blogs on this topic. Use this competitor data as INSPIRATION and GUIDANCE, but you are an expert content strategist - use your knowledge to create a logical, coherent structure that tells a complete story.
+I analyzed ${analyses.length} competitor blogs. Use their data as REFERENCE, but you MUST create original, topic-specific content based on your expertise.
 
-COMPETITOR DATA (Use as reference, not strict requirement):
+COMPETITOR DATA (Reference only):
 ${analyses.map((a, i) => `
 BLOG ${i + 1}: ${a.url}
-- H2 Headings Found: ${a.structure.h2s.filter(h => h && h.trim()).join(' | ') || 'None found'}
-- H3 Headings Found: ${a.structure.h3s.filter(h => h && h.trim()).slice(0, 5).join(' | ') || 'None found'}
-- Keywords: ${a.primaryKeywords.filter(k => k && k.trim()).join(', ') || 'None found'}
-- Word Count: ${a.wordCount}
-- Tone: ${a.tone}
-- Main Topics: ${a.keyTopics.filter(t => t && t.trim()).join(', ') || 'None found'}
-- Unique Insights: ${a.uniqueAngles.filter(u => u && u.trim()).join(', ') || 'None found'}
+- H2 Headings: ${a.structure.h2s.filter(h => h && h.trim()).join(' | ') || 'None found'}
+- H3 Headings: ${a.structure.h3s.filter(h => h && h.trim()).slice(0, 8).join(' | ') || 'None found'}
+- Keywords: ${a.primaryKeywords.filter(k => k && k.trim()).slice(0, 10).join(', ') || 'None found'}
+- Topics: ${a.keyTopics.filter(t => t && t.trim()).slice(0, 8).join(', ') || 'None found'}
+- Insights: ${a.uniqueAngles.filter(u => u && u.trim()).slice(0, 5).join(', ') || 'None found'}
 `).join('\n')}
 
-KEYWORDS FROM COMPETITORS (Use as inspiration):
-${uniqueKeywords.filter(k => k && k.trim()).join(', ')}
+KEYWORDS FROM COMPETITORS: ${uniqueKeywords.filter(k => k && k.trim()).slice(0, 15).join(', ')}
 
-CRITICAL REQUIREMENTS FOR CONTENT SECTIONS:
-1. Create 4-7 sections that tell a logical, coherent story about "${topic}"
-2. Each section MUST have exactly 3 bullet points (h3s) - NO EXCEPTIONS
-3. Sections should flow logically (e.g., Introduction → Core Concepts → Implementation → Advanced Tips → Conclusion)
-4. Avoid repetition - each section should cover a distinct aspect of the topic
-5. If competitor blogs don't have enough detail, use your expert knowledge to create relevant, specific bullet points
-6. Make bullet points actionable and specific to "${topic}" - avoid generic advice
-7. Ensure sections build upon each other to create a complete narrative
+🚫 ABSOLUTELY FORBIDDEN - DO NOT USE THESE GENERIC TEMPLATES:
+- H1: "${topic}: A Complete Guide" or "${topic}: The Ultimate Guide" or any variation
+- H2: "Introduction", "Main Content", "Conclusion", "Overview", "Summary"
+- H3: "Understanding [topic]", "Key strategies for [topic]", "Best practices for [topic]"
+- Any generic phrases that could apply to ANY topic
 
-STRUCTURE GUIDELINES:
-- Think like a content strategist: What would a reader need to know about "${topic}"?
-- Start with foundational concepts, then move to practical application
-- Each section should be distinct and valuable on its own
-- Bullet points should be specific, actionable, and relevant to the section's theme
-- Use competitor data to understand what's commonly covered, but don't limit yourself to only what they wrote
+✅ REQUIRED - YOU MUST:
+1. Create a UNIQUE, CREATIVE H1 headline that's specific to "${topic}" - NOT just "{topic}: A Complete Guide"
+   Examples of good H1s: "10 Project Management Tools That Actually Save Small Teams Time", "How to Choose the Right CRM for Your Sales Team", "The Complete Breakdown of Email Marketing Automation"
+   
+2. Create 4-7 SPECIFIC H2 sections that are unique to "${topic}" and tell a complete story
+   - Each H2 must be a distinct, valuable section about "${topic}"
+   - Think: What does someone searching for "${topic}" actually need to know?
+   - Use competitor H2s as inspiration, but create your own unique structure
+   
+3. Each H2 section MUST have exactly 3 H3 bullet points that are:
+   - SPECIFIC to that H2 section and "${topic}"
+   - ACTIONABLE and valuable
+   - Based on competitor data OR your expert knowledge of "${topic}"
+   - NOT generic templates like "Understanding X" or "Key strategies for X"
+   
+4. If competitor data is insufficient, use your EXPERT KNOWLEDGE of "${topic}" to create relevant, specific content
+   - You are an expert on "${topic}" - use that knowledge
+   - Create content that would genuinely help someone researching "${topic}"
 
-Return a comprehensive brief as JSON (no markdown, no explanation):
+THINKING PROCESS:
+1. What are the key aspects someone needs to understand about "${topic}"?
+2. What questions do people have about "${topic}"?
+3. What would make a comprehensive, valuable guide about "${topic}"?
+4. How can I structure this to tell a complete story from basics to advanced?
+
+Return ONLY valid JSON (no markdown, no explanations):
 
 {
   "seoData": {
-    "title": "SEO-optimized blog title (50-60 characters) for topic: ${topic}",
-    "primaryKeyword": "main target keyword (use competitor keywords as inspiration)",
+    "title": "Creative, SEO-optimized title (50-60 chars) - NOT '${topic}: A Complete Guide'",
+    "primaryKeyword": "main keyword from competitor analysis or topic",
     "secondaryKeywords": ["keyword2", "keyword3", "keyword4"],
     "searchIntent": "informational/transactional/navigational/commercial",
     "difficulty": "low/medium/high"
   },
   "targetSpecs": {
-    "wordCount": "recommended word count range based on competitor average (e.g., 2000-2500 words)",
-    "readingLevel": "target reading level (e.g., grade 8-10)",
-    "tone": "recommended tone based on competitor analysis (e.g., professional, conversational)",
-    "format": "article format based on competitor style (e.g., how-to guide, listicle, comparison)"
+    "wordCount": "range based on competitor average (e.g., 2000-2500 words)",
+    "readingLevel": "target level (e.g., grade 8-10)",
+    "tone": "tone from competitor analysis",
+    "format": "format from competitor style"
   },
   "structure": {
-    "h1": "Compelling main headline for the article about ${topic}",
+    "h1": "UNIQUE, CREATIVE headline specific to ${topic} - NOT a generic template",
     "sections": [
       {
-        "h2": "Section heading 1 (foundational/conceptual)",
-        "h3s": ["Specific bullet point 1", "Specific bullet point 2", "Specific bullet point 3"]
+        "h2": "Specific section 1 about ${topic} (NOT 'Introduction')",
+        "h3s": ["Specific, actionable point 1", "Specific, actionable point 2", "Specific, actionable point 3"]
       },
       {
-        "h2": "Section heading 2 (practical/implementation)",
-        "h3s": ["Specific bullet point 1", "Specific bullet point 2", "Specific bullet point 3"]
+        "h2": "Specific section 2 about ${topic} (NOT 'Main Content')",
+        "h3s": ["Specific, actionable point 1", "Specific, actionable point 2", "Specific, actionable point 3"]
       },
       {
-        "h2": "Section heading 3 (advanced/detailed)",
-        "h3s": ["Specific bullet point 1", "Specific bullet point 2", "Specific bullet point 3"]
+        "h2": "Specific section 3 about ${topic}",
+        "h3s": ["Specific, actionable point 1", "Specific, actionable point 2", "Specific, actionable point 3"]
+      },
+      {
+        "h2": "Specific section 4 about ${topic}",
+        "h3s": ["Specific, actionable point 1", "Specific, actionable point 2", "Specific, actionable point 3"]
       }
     ]
   },
   "competitorAnalysis": {
-    "commonTopics": ["topic all competitors cover", "another common topic"],
-    "avgWordCount": "average word count across analyzed blogs",
-    "gaps": ["topic competitors missed", "another gap opportunity"]
+    "commonTopics": ["topic from analysis", "another topic"],
+    "avgWordCount": "average from analysis",
+    "gaps": ["gap opportunity 1", "gap opportunity 2"]
   },
   "contentRequirements": {
-    "mustInclude": ["essential element 1", "essential element 2", "essential element 3"],
-    "internalLinks": ["suggested internal link topic 1", "suggested topic 2", "suggested topic 3"],
-    "externalLinks": ["type of external source to link 1", "type 2", "type 3"],
-    "visuals": ["recommended visual type 1", "recommended type 2", "recommended type 3"]
+    "mustInclude": ["element 1", "element 2", "element 3"],
+    "internalLinks": ["link topic 1", "link topic 2", "link topic 3"],
+    "externalLinks": ["source type 1", "source type 2", "source type 3"],
+    "visuals": ["visual type 1", "visual type 2", "visual type 3"]
   },
   "writingInstructions": {
-    "audience": "target audience description based on topic and competitor analysis",
-    "voice": "brand voice description matching competitor tone",
-    "keyPoints": ["key message 1", "key message 2", "key message 3"],
-    "avoid": ["what not to do 1", "what not to do 2", "what not to do 3"],
-    "cta": "suggested call-to-action relevant to ${topic}"
+    "audience": "target audience for ${topic}",
+    "voice": "voice matching competitor tone",
+    "keyPoints": ["message 1", "message 2", "message 3"],
+    "avoid": ["avoid 1", "avoid 2", "avoid 3"],
+    "cta": "CTA relevant to ${topic}"
   },
   "metaData": {
-    "title": "SEO meta title (50-60 characters) for ${topic}",
-    "description": "SEO meta description (150-160 characters) for ${topic}"
+    "title": "SEO meta title (50-60 chars) for ${topic}",
+    "description": "SEO meta description (150-160 chars) for ${topic}"
   }
 }
 
-ABSOLUTE REQUIREMENTS:
-- Return ONLY the JSON object, no markdown formatting, no explanation text
-- structure.sections MUST have 4-7 sections
-- Each section.h3s MUST have exactly 3 items (no more, no less)
-- All bullet points must be specific to "${topic}" and actionable
-- Sections must flow logically and tell a complete story
-- Use competitor data as inspiration, but fill gaps with your expert knowledge
-- Avoid generic phrases like "Introduction", "Conclusion", "Main Content" unless they truly fit the narrative`;
+CRITICAL: Every H2 and H3 must be SPECIFIC to "${topic}" and valuable. NO generic templates allowed.`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    // Function to validate if content is generic
+    const isGenericContent = (brief: any): boolean => {
+      const briefStr = JSON.stringify(brief).toLowerCase();
+      
+      // Check for generic H1 patterns
+      const genericH1Patterns = [
+        `${topic.toLowerCase()}: a complete guide`,
+        `${topic.toLowerCase()}: the ultimate guide`,
+        `${topic.toLowerCase()}: complete guide`,
+        `${topic.toLowerCase()}: ultimate guide`
+      ];
+      
+      const h1 = brief.structure?.h1?.toLowerCase() || '';
+      if (genericH1Patterns.some(pattern => h1.includes(pattern))) {
+        console.log(`[GEMINI] ❌ Generic H1 detected: "${brief.structure.h1}"`);
+        return true;
+      }
+      
+      // Check for generic H2 patterns
+      const genericH2s = ['introduction', 'main content', 'conclusion', 'overview', 'summary'];
+      const h2s = brief.structure?.sections?.map((s: any) => s.h2?.toLowerCase()) || [];
+      const hasGenericH2 = h2s.some((h2: string) => genericH2s.includes(h2));
+      if (hasGenericH2) {
+        console.log(`[GEMINI] ❌ Generic H2 detected: ${h2s.filter((h2: string) => genericH2s.includes(h2)).join(', ')}`);
+        return true;
+      }
+      
+      // Check for generic H3 patterns
+      const genericH3Patterns = [
+        'understanding ',
+        'key strategies for ',
+        'best practices for ',
+        'important aspect of ',
+        'key consideration '
+      ];
+      
+      const allH3s = brief.structure?.sections?.flatMap((s: any) => s.h3s || []) || [];
+      const hasGenericH3 = allH3s.some((h3: string) => 
+        genericH3Patterns.some(pattern => h3.toLowerCase().includes(pattern))
+      );
+      
+      if (hasGenericH3) {
+        console.log(`[GEMINI] ❌ Generic H3 patterns detected`);
+        return true;
+      }
+      
+      return false;
+    };
     
-    // Clean the response
-    const cleanedText = text
-      .replace(/```json\n?/g, '')
-      .replace(/```\n?/g, '')
-      .trim();
+    // Function to generate topic-specific H3s using AI
+    const generateTopicSpecificH3s = async (h2: string, existingH3s: string[]): Promise<string[]> => {
+      try {
+        const h3Prompt = `You are an expert on "${topic}". For the section "${h2}", generate 3 specific, actionable bullet points (H3s) that are:
+- Specific to "${topic}" and "${h2}"
+- Actionable and valuable
+- NOT generic templates like "Understanding X" or "Key strategies for X"
+
+Existing H3s (use as reference, but create new ones): ${existingH3s.join(', ')}
+
+Return ONLY a JSON array of exactly 3 H3 bullet points:
+["H3 point 1", "H3 point 2", "H3 point 3"]`;
+
+        const h3Result = await model.generateContent(h3Prompt);
+        const h3Response = await h3Result.response;
+        const h3Text = h3Response.text()
+          .replace(/```json\n?/g, '')
+          .replace(/```\n?/g, '')
+          .trim();
+        
+        const generatedH3s = JSON.parse(h3Text);
+        if (Array.isArray(generatedH3s) && generatedH3s.length >= 3) {
+          return generatedH3s.slice(0, 3);
+        }
+      } catch (error) {
+        console.log(`[GEMINI] ⚠️ Failed to generate topic-specific H3s: ${error}`);
+      }
+      
+      // Fallback: create topic-specific H3s based on competitor data
+      const relevantH3s = allH3Headings.filter(h3 => 
+        h3 && h3.toLowerCase().includes(topic.toLowerCase().split(' ')[0])
+      );
+      
+      if (relevantH3s.length >= 3) {
+        return relevantH3s.slice(0, 3);
+      }
+      
+      // Last resort: use competitor H3s
+      return allH3Headings.slice(0, 3).filter(h3 => h3 && h3.trim());
+    };
     
-    const brief = JSON.parse(cleanedText);
+    let brief: any;
+    let attempts = 0;
+    const maxAttempts = 3;
+    let currentPrompt = prompt;
+    
+    // Retry loop to ensure we get non-generic content
+    while (attempts < maxAttempts) {
+      attempts++;
+      console.log(`[GEMINI] 🔄 Generation attempt ${attempts}/${maxAttempts}`);
+      
+      const result = await model.generateContent(currentPrompt);
+      const response = await result.response;
+      const text = response.text();
+      
+      // Clean the response
+      const cleanedText = text
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim();
+      
+      brief = JSON.parse(cleanedText);
+      
+      // Validate the brief has all required fields
+      if (!brief.seoData || !brief.targetSpecs || !brief.structure || 
+          !brief.competitorAnalysis || !brief.contentRequirements || 
+          !brief.writingInstructions || !brief.metaData) {
+        throw new Error('Generated brief is missing required fields');
+      }
+      
+      // Check if content is generic
+      if (!isGenericContent(brief)) {
+        console.log(`[GEMINI] ✅ Generated non-generic content on attempt ${attempts}`);
+        break;
+      } else {
+        console.log(`[GEMINI] ⚠️ Generic content detected, retrying... (attempt ${attempts}/${maxAttempts})`);
+        if (attempts < maxAttempts) {
+          // Add a stronger instruction for retry
+          currentPrompt = prompt + `\n\n⚠️ CRITICAL RETRY INSTRUCTION: Your previous attempt generated generic templates. You MUST create unique, topic-specific content for "${topic}". DO NOT use "Introduction", "Main Content", "Conclusion", or generic H3 patterns. Create original, valuable content specific to "${topic}".`;
+        }
+      }
+    }
     
     // Validate and fix structure sections
     if (brief.structure?.sections) {
@@ -325,19 +454,19 @@ ABSOLUTE REQUIREMENTS:
       const seenH2s = new Set<string>();
       const genericH2s = ['introduction', 'main content', 'conclusion', 'overview', 'summary', 'final thoughts'];
       
-      brief.structure.sections.forEach((section: any) => {
+      for (const section of brief.structure.sections) {
         const h2Normalized = section.h2?.toLowerCase().trim();
         
         // Skip if duplicate
         if (seenH2s.has(h2Normalized)) {
           console.log(`[GEMINI] ⚠️ Skipping duplicate H2: ${section.h2}`);
-          return;
+          continue;
         }
         
         // Skip if generic (unless it's the only section)
         if (genericH2s.includes(h2Normalized) && brief.structure.sections.length > 1) {
           console.log(`[GEMINI] ⚠️ Skipping generic H2: ${section.h2}`);
-          return;
+          continue;
         }
         
         // Ensure h3s array exists and has exactly 3 items
@@ -346,28 +475,30 @@ ABSOLUTE REQUIREMENTS:
         }
         
         // Remove empty or duplicate h3s
-        const validH3s = section.h3s
+        let validH3s = section.h3s
           .filter((h3: string) => h3 && h3.trim())
           .filter((h3: string, index: number, self: string[]) => 
             self.findIndex((h) => h.toLowerCase().trim() === h3.toLowerCase().trim()) === index
           );
         
-        // If we have less than 3, pad with topic-specific suggestions
-        while (validH3s.length < 3) {
-          const placeholder = `Important aspect of ${section.h2 || topic}`;
-          if (!validH3s.some((h3: string) => h3.toLowerCase().includes(placeholder.toLowerCase()))) {
-            validH3s.push(placeholder);
-          } else {
-            validH3s.push(`Key consideration ${validH3s.length + 1} for ${section.h2 || topic}`);
-          }
+        // Check if H3s are generic
+        const genericH3Patterns = ['understanding ', 'key strategies for ', 'best practices for ', 'important aspect of ', 'key consideration '];
+        const hasGenericH3s = validH3s.some((h3: string) => 
+          genericH3Patterns.some(pattern => h3.toLowerCase().includes(pattern))
+        );
+        
+        // If we have less than 3 OR generic H3s, generate topic-specific ones
+        if (validH3s.length < 3 || hasGenericH3s) {
+          console.log(`[GEMINI] 🔄 Generating topic-specific H3s for "${section.h2}"`);
+          validH3s = await generateTopicSpecificH3s(section.h2, validH3s);
         }
         
-        // Keep exactly 3
+        // Ensure exactly 3
         section.h3s = validH3s.slice(0, 3);
         
         seenH2s.add(h2Normalized);
         uniqueSections.push(section);
-      });
+      }
       
       // Ensure we have at least 4 sections
       if (uniqueSections.length < 4) {
@@ -388,97 +519,111 @@ ABSOLUTE REQUIREMENTS:
     console.log(`[GEMINI] Recommended word count: ${brief.targetSpecs?.wordCount}`);
     console.log(`[GEMINI] Structure sections: ${brief.structure?.sections?.length || 0}`);
     
-    // Validate the brief has all required fields
-    if (!brief.seoData || !brief.targetSpecs || !brief.structure || 
-        !brief.competitorAnalysis || !brief.contentRequirements || 
-        !brief.writingInstructions || !brief.metaData) {
-      throw new Error('Generated brief is missing required fields');
-    }
-    
-    // Validate that we're not using generic template content
-    const genericPhrases = [
-      'Fluff content', 'Outdated information', 'Overly technical jargon',
-      'Introduction', 'Main Content', 'Conclusion', 'Main benefits',
-      'How-to instructions', 'Related topic', 'Authority sources'
-    ];
-    
-    const hasGenericContent = genericPhrases.some(phrase => 
-      JSON.stringify(brief).toLowerCase().includes(phrase.toLowerCase())
-    );
-    
-    if (hasGenericContent) {
-      console.log(`[GEMINI] ⚠️ WARNING: Brief may contain generic template content`);
-      console.log(`[GEMINI] ⚠️ This suggests AI analysis may not be working properly`);
-    }
-    
     return brief;
     
   } catch (error) {
     console.error(`[GEMINI] ❌ Brief synthesis failed:`, error);
     
-    // Create a basic fallback brief
-    console.log(`[GEMINI] 🔄 Creating fallback brief...`);
+    // Create a fallback brief using AI to generate topic-specific content
+    console.log(`[GEMINI] 🔄 Creating fallback brief with AI-generated content...`);
     
-    const avgWordCount = Math.round(
-      analyses.reduce((sum, a) => sum + a.wordCount, 0) / analyses.length
-    );
-    
-    const allKeywords = analyses.flatMap(a => a.primaryKeywords);
-    const uniqueKeywords = Array.from(new Set(allKeywords));
-    
-    const allTopics = analyses.flatMap(a => a.keyTopics);
-    const uniqueTopics = Array.from(new Set(allTopics));
-    
-    const allH2s = analyses.flatMap(a => a.structure.h2s);
-    
-    return {
-      seoData: {
-        title: `The Ultimate Guide to ${topic}`,
-        primaryKeyword: uniqueKeywords[0] || topic,
-        secondaryKeywords: uniqueKeywords.slice(1, 4),
-        searchIntent: 'informational',
-        difficulty: 'medium'
-      },
-      targetSpecs: {
-        wordCount: `${avgWordCount - 200}-${avgWordCount + 200} words`,
-        readingLevel: 'Grade 8-10',
-        tone: analyses[0]?.tone || 'professional',
-        format: analyses[0]?.style || 'comprehensive guide'
-      },
-      structure: {
-        h1: `${topic}: A Complete Guide`,
-        sections: allH2s.slice(0, 6).map((h2, index) => ({
-          h2: h2 || `Section ${index + 1}`,
-          h3s: [
-            `Understanding ${h2 || topic}`,
-            `Key strategies for ${h2 || topic}`,
-            `Best practices for ${h2 || topic}`
-          ]
-        }))
-      },
-      competitorAnalysis: {
-        commonTopics: uniqueTopics.slice(0, 5),
-        avgWordCount: `${avgWordCount} words`,
-        gaps: ['Practical examples', 'Step-by-step tutorials', 'Expert insights']
-      },
-      contentRequirements: {
-        mustInclude: uniqueTopics.slice(0, 4),
-        internalLinks: [`${topic} resources`, `${topic} tools`, `${topic} strategies`],
-        externalLinks: [`${topic} research`, `${topic} case studies`, `${topic} industry reports`],
-        visuals: [`${topic} infographic`, `${topic} comparison chart`, `${topic} workflow diagram`]
-      },
-      writingInstructions: {
-        audience: `${topic} professionals and decision makers`,
-        voice: 'Expert and authoritative',
-        keyPoints: uniqueTopics.slice(0, 3),
-        avoid: [`Generic ${topic} advice`, `Outdated ${topic} information`, `Vague ${topic} recommendations`],
-        cta: `Get started with ${topic} today`
-      },
-      metaData: {
-        title: `${topic}: Expert Guide & Best Practices`,
-        description: `Master ${topic} with expert insights, proven strategies, and actionable tips from industry professionals.`
-      }
-    };
+    try {
+      const genAI = getGeminiAI();
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+      
+      const avgWordCount = Math.round(
+        analyses.reduce((sum, a) => sum + a.wordCount, 0) / (analyses.length || 1)
+      );
+      
+      const allKeywords = analyses.flatMap(a => a.primaryKeywords);
+      const uniqueKeywords = Array.from(new Set(allKeywords));
+      
+      const allTopics = analyses.flatMap(a => a.keyTopics);
+      const uniqueTopics = Array.from(new Set(allTopics));
+      
+      const allH2s = analyses.flatMap(a => a.structure.h2s).filter(h2 => h2 && h2.trim());
+      const allH3s = analyses.flatMap(a => a.structure.h3s).filter(h3 => h3 && h3.trim());
+      
+      // Generate fallback brief using AI
+      const fallbackPrompt = `Create a blog brief for "${topic}" with:
+- A creative, unique H1 headline (NOT "${topic}: A Complete Guide")
+- 4-6 specific H2 sections about "${topic}" (NOT "Introduction", "Main Content", "Conclusion")
+- Each H2 must have exactly 3 specific H3 bullet points about "${topic}"
+
+Use these competitor insights:
+- Keywords: ${uniqueKeywords.slice(0, 10).join(', ')}
+- Topics: ${uniqueTopics.slice(0, 8).join(', ')}
+- H2s found: ${allH2s.slice(0, 10).join(', ') || 'None'}
+- H3s found: ${allH3s.slice(0, 15).join(', ') || 'None'}
+
+Return ONLY JSON:
+{
+  "h1": "Creative headline for ${topic}",
+  "sections": [
+    {"h2": "Specific section 1", "h3s": ["point 1", "point 2", "point 3"]},
+    {"h2": "Specific section 2", "h3s": ["point 1", "point 2", "point 3"]},
+    {"h2": "Specific section 3", "h3s": ["point 1", "point 2", "point 3"]},
+    {"h2": "Specific section 4", "h3s": ["point 1", "point 2", "point 3"]}
+  ]
+}`;
+
+      const fallbackResult = await model.generateContent(fallbackPrompt);
+      const fallbackResponse = await fallbackResult.response;
+      const fallbackText = fallbackResponse.text()
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim();
+      
+      const fallbackData = JSON.parse(fallbackText);
+      
+      return {
+        seoData: {
+          title: fallbackData.h1 || `Expert Guide: ${topic}`,
+          primaryKeyword: uniqueKeywords[0] || topic,
+          secondaryKeywords: uniqueKeywords.slice(1, 4),
+          searchIntent: 'informational',
+          difficulty: 'medium'
+        },
+        targetSpecs: {
+          wordCount: `${Math.max(1500, avgWordCount - 200)}-${avgWordCount + 200} words`,
+          readingLevel: 'Grade 8-10',
+          tone: analyses[0]?.tone || 'professional',
+          format: analyses[0]?.style || 'comprehensive guide'
+        },
+        structure: {
+          h1: fallbackData.h1 || `Expert Insights on ${topic}`,
+          sections: (fallbackData.sections || []).map((section: any) => ({
+            h2: section.h2 || `Section about ${topic}`,
+            h3s: (section.h3s || []).slice(0, 3).filter((h3: string) => h3 && h3.trim())
+          })).filter((section: any) => section.h2 && section.h3s.length === 3)
+        },
+        competitorAnalysis: {
+          commonTopics: uniqueTopics.slice(0, 5),
+          avgWordCount: `${avgWordCount} words`,
+          gaps: ['Practical examples', 'Step-by-step tutorials', 'Expert insights']
+        },
+        contentRequirements: {
+          mustInclude: uniqueTopics.slice(0, 4),
+          internalLinks: [`${topic} resources`, `${topic} tools`, `${topic} strategies`],
+          externalLinks: [`${topic} research`, `${topic} case studies`, `${topic} industry reports`],
+          visuals: [`${topic} infographic`, `${topic} comparison chart`, `${topic} workflow diagram`]
+        },
+        writingInstructions: {
+          audience: `${topic} professionals and decision makers`,
+          voice: 'Expert and authoritative',
+          keyPoints: uniqueTopics.slice(0, 3),
+          avoid: [`Generic ${topic} advice`, `Outdated ${topic} information`, `Vague ${topic} recommendations`],
+          cta: `Get started with ${topic} today`
+        },
+        metaData: {
+          title: fallbackData.h1 || `${topic}: Expert Guide & Best Practices`,
+          description: `Master ${topic} with expert insights, proven strategies, and actionable tips from industry professionals.`
+        }
+      };
+    } catch (fallbackError) {
+      console.error(`[GEMINI] ❌ Fallback generation also failed:`, fallbackError);
+      throw new Error('Failed to generate brief after multiple attempts');
+    }
   }
 }
 
